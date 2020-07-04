@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useReducer, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { useImmerReducer } from "use-immer";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Axios from "axios";
 // Custom Components
@@ -12,42 +13,78 @@ import Home from "./components/Home";
 import CreatePost from "./components/CreatePost";
 import FlashMessages from "./components/FlashMessages";
 import ViewSinglePost from "./components/ViewSinglePost";
-import ExampleContext from "./ExampleContext";
+import StateContext from "./StateContext";
+import DispatchContext from "./DispatchContext";
 
 Axios.defaults.baseURL = "http://localhost:8080";
 
 function Main() {
-  const [loggedIn, setLoggedIn] = useState(Boolean(localStorage.getItem("socialIndiaToken")));
-  const [flashMessages, setFlashMessages] = useState([]);
+  const initialState = {
+    loggedIn: Boolean(localStorage.getItem("socialIndiaToken")),
+    flashMessages: [],
+    user: {
+      token: localStorage.getItem("socialIndiaToken"),
+      username: localStorage.getItem("socialIndiaUsername"),
+      avatar: localStorage.getItem("socialIndiaAvatar")
+    }
+  };
 
-  function addFlashMessage(msg) {
-    setFlashMessages((prev) => prev.concat(msg));
+  function ourReducer(draft, action) {
+    switch (action.type) {
+      case "login":
+        draft.loggedIn = true;
+        draft.user = action.data;
+        break;
+      case "logout":
+        draft.loggedIn = false;
+        break;
+      case "flashMessage":
+        draft.flashMessages.push(action.value);
+        break;
+    }
   }
+
+  const [state, dispatch] = useImmerReducer(ourReducer, initialState);
+
+  useEffect(() => {
+    if (state.loggedIn) {
+      localStorage.setItem("socialIndiaToken", state.user.token);
+      localStorage.setItem("socialIndiaUsername", state.user.username);
+      localStorage.setItem("socialIndiaAvatar", state.user.avatar);
+    } else {
+      localStorage.removeItem("socialIndiaToken");
+      localStorage.removeItem("socialIndiaUsername");
+      localStorage.removeItem("socialIndiaAvatar");
+    }
+  }, [state.loggedIn]);
+
   return (
-    <ExampleContext.Provider value={(addFlashMessage, setLoggedIn)}>
-      <BrowserRouter>
-        <FlashMessages messages={flashMessages} />
-        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-        <Switch>
-          <Route path="/" exact>
-            {loggedIn ? <Home /> : <HomeGuest />}
-          </Route>
-          <Route path="/post/:id">
-            <ViewSinglePost />
-          </Route>
-          <Route path="/create-post">
-            <CreatePost />
-          </Route>
-          <Route path="/about-us">
-            <About />
-          </Route>
-          <Route path="/terms">
-            <Terms />
-          </Route>
-        </Switch>
-        <Footer />
-      </BrowserRouter>
-    </ExampleContext.Provider>
+    <StateContext.Provider value={state}>
+      <DispatchContext.Provider value={dispatch}>
+        <BrowserRouter>
+          <FlashMessages messages={state.flashMessages} />
+          <Header />
+          <Switch>
+            <Route path="/" exact>
+              {state.loggedIn ? <Home /> : <HomeGuest />}
+            </Route>
+            <Route path="/post/:id">
+              <ViewSinglePost />
+            </Route>
+            <Route path="/create-post">
+              <CreatePost />
+            </Route>
+            <Route path="/about-us">
+              <About />
+            </Route>
+            <Route path="/terms">
+              <Terms />
+            </Route>
+          </Switch>
+          <Footer />
+        </BrowserRouter>
+      </DispatchContext.Provider>
+    </StateContext.Provider>
   );
 }
 

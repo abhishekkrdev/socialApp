@@ -1,21 +1,18 @@
 import React, { useState, useContext } from "react";
 import Axios from "axios";
-import ExampleContext from "../ExampleContext";
+import DispatchContext from "../DispatchContext";
 
-function HeaderLoggedOut(props) {
+function HeaderLoggedOut() {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
-  const { setLoggedIn } = useContext(ExampleContext);
+  const appDispatch = useContext(DispatchContext);
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
       const response = await Axios.post("/login", { username, password });
       if (response.data) {
-        localStorage.setItem("socialIndiaToken", response.data.token);
-        localStorage.setItem("socialIndiaUsername", response.data.username);
-        localStorage.setItem("socialIndiaAvatar", response.data.avatar);
-        setLoggedIn(true);
+        appDispatch({ type: "login", data: response.data });
       } else {
         console.log("Incorrect username / password");
       }

@@ -2,19 +2,21 @@ import React, { useState, useContext } from "react";
 import Axios from "axios";
 import { withRouter } from "react-router-dom";
 import Page from "./Page";
-import ExampleContext from "../ExampleContext";
+import DispatchContext from "../DispatchContext";
+import StateContext from "../StateContext";
 
 function CreatePost(props) {
   const [title, setTitle] = useState();
   const [body, setBody] = useState();
-  const { addFlashMessage } = useContext(ExampleContext);
+  const appDispatch = useContext(DispatchContext);
+  const appState = useContext(StateContext);
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const respose = await Axios.post(`/create-post`, { title, body, token: localStorage.getItem("socialIndiaToken") });
+      const respose = await Axios.post(`/create-post`, { title, body, token: appState.user.token });
       // Redirect to new post url
-      addFlashMessage("Congrats, you successfully created a post");
+      appDispatch({ type: "flashMessage", value: "Congrats, you created a new post " });
       props.history.push(`/post/${respose.data}`);
       console.log(`New Post was created`);
     } catch (e) {
