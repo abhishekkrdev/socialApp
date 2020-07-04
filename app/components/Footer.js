@@ -13,7 +13,7 @@ function Footer() {
           About Us
         </Link>{" "}
         |{" "}
-        <Link className="mx-1" href="/terms">
+        <Link className="mx-1" to="/terms">
           Terms
         </Link>
       </p>
