@@ -13,6 +13,7 @@ import Home from "./components/Home";
 import CreatePost from "./components/CreatePost";
 import FlashMessages from "./components/FlashMessages";
 import ViewSinglePost from "./components/ViewSinglePost";
+import Profile from "./components/Profile";
 import StateContext from "./StateContext";
 import DispatchContext from "./DispatchContext";
 
@@ -67,6 +68,9 @@ function Main() {
           <Switch>
             <Route path="/" exact>
               {state.loggedIn ? <Home /> : <HomeGuest />}
+            </Route>
+            <Route path="/profile/:username">
+              <Profile />
             </Route>
             <Route path="/post/:id">
               <ViewSinglePost />
