@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Axios from "axios";
+import ReactMarkDown from 'react-markdown';
 import Page from "./Page";
+import LoadingDotsIcon from './LoadingDotsIcon';
+import ReactMarkdown from "react-markdown";
 
 function ViewSinglePost() {
   const { id } = useParams();
@@ -9,26 +12,33 @@ function ViewSinglePost() {
   const [post, setPost] = useState();
 
   useEffect(() => {
+    const ourRequest = Axios.CancelToken.source()
     async function fetchPost() {
       try {
-        const respose = await Axios.get(`/post/${id}`);
+        const respose = await Axios.get(`/post/${id}`, { cancelToken: ourRequest.token });
         setPost(respose.data);
         setIsLoading(false);
       } catch (e) {
-        console.log(`There was a problem ${e}`);
+        console.log(`There was a problem or the request was cancelled`);
       }
     }
     fetchPost();
+    return () => {
+      ourRequest.cancel();
+    }
   });
   if (isLoading) {
     return (
       <Page title="...">
-        <div>Loading ...</div>
+        <LoadingDotsIcon />
       </Page>
     );
   }
+
+  const date = new Date(`${post.createdDate}`);
+  const dateFormatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   return (
-    <Page title="Post">
+    <Page title={post.title}>
       <div className="d-flex justify-content-between">
         <h2>{post.title}</h2>
         <span className="pt-2">
@@ -42,13 +52,15 @@ function ViewSinglePost() {
       </div>
 
       <p className="text-muted small mb-4">
-        <a href="#">
+        <Link to={`/profile/${post.author.username}`}>
           <img className="avatar-tiny" src={post.author.avatar} />
-        </a>
-        Posted by <a href="#">{post.author.username}</a> on 2/10/2020
+        </Link>
+  Posted by <Link to={`/profile/${post.author.username}`}>{post.author.username}</Link> on {dateFormatted}
       </p>
 
-      <div className="body-content">{post.body}</div>
+      <div className="body-content">
+        <ReactMarkdown source={post.body} allowedTypes={["paragraph", "strong", "emphasis", "text", "heading", "list", "listItem"]} />
+      </div>
     </Page>
   );
 }
