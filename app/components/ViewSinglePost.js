@@ -26,7 +26,7 @@ function ViewSinglePost() {
     return () => {
       ourRequest.cancel();
     };
-  });
+  }, [id]);
 
   if (isLoading) {
     return (
