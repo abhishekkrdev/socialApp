@@ -57,7 +57,6 @@ function Main() {
         break;
       case 'toggleChat':
         draft.isChatOpen = !draft.isChatOpen;
-        console.log('helo');
         break;
       case 'closeChat':
         draft.isChatOpen = false;
@@ -84,6 +83,34 @@ function Main() {
       localStorage.removeItem('socialIndiaAvatar');
     }
   }, [state.loggedIn]);
+
+  // Check if our token is expired or not
+  useEffect(() => {
+    if (state.loggedIn) {
+      const ourRequest = Axios.CancelToken.source();
+      async function fetchResults() {
+        try {
+          const response = await Axios.post(
+            '/checkToken',
+            { token: state.user.token },
+            { cancelToken: ourRequest.token }
+          );
+          if (!response.data) {
+            dispatch({ type: 'logout' });
+            dispatch({
+              type: 'flashMessage',
+              value: 'Your session has expired.Please Log In Again'
+            });
+          }
+        } catch (e) {
+          console.log('There was a problem or the request was cancelled');
+        }
+      }
+
+      fetchResults();
+      return () => ourRequest.cancel();
+    }
+  }, []);
 
   return (
     <StateContext.Provider value={state}>

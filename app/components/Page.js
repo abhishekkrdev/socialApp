@@ -3,7 +3,7 @@ import Container from './Container';
 
 function Page(props) {
   useEffect(() => {
-    document.title = `${props.title} | Dev Social`;
+    document.title = `${props.title} | Social India`;
     window.scrollTo(0, 0);
   }, [props.title]);
   return <Container wide={props.wide}>{props.children}</Container>;
