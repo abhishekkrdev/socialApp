@@ -157,7 +157,6 @@ function Main() {
             </div>
           </CSSTransition>
           <Suspense fallback=''>{state.loggedIn && <Chat />}</Suspense>
-          <Chat />
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
