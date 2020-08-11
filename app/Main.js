@@ -22,7 +22,7 @@ import StateContext from './StateContext';
 import DispatchContext from './DispatchContext';
 import LoadingDotsIcon from './components/LoadingDotsIcon';
 
-Axios.defaults.baseURL = process.env.BACKENDURL || '';
+Axios.defaults.baseURL = process.env.BACKENDURL || 'https://social-india-api.herokuapp.com';
 
 function Main() {
   const initialState = {
