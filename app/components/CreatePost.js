@@ -14,10 +14,10 @@ function CreatePost(props) {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const respose = await Axios.post(`/create-post`, { title, body, token: appState.user.token });
+      const response = await Axios.post(`/create-post`, { title, body, token: appState.user.token });
       // Redirect to new post url
       appDispatch({ type: "flashMessage", value: "Congrats, you created a new post " });
-      props.history.push(`/post/${respose.data}`);
+      props.history.push(`/post/${response.data}`);
       console.log(`New Post was created`);
     } catch (e) {
       console.log(`There was a problem ${e}`);

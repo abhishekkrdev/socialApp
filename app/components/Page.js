@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import Container from "./Container";
+import React, { useEffect } from 'react';
+import Container from './Container';
 
 function Page(props) {
   useEffect(() => {
-    document.title = `${props.title} | Complex App`;
+    document.title = `${props.title} | Dev Social`;
     window.scrollTo(0, 0);
   }, [props.title]);
   return <Container wide={props.wide}>{props.children}</Container>;
